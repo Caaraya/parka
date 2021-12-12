@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NepCodex Demo - {{.PageTitle}}</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+<h1>Hello Demo App </h1>
+<div>
+    <h2>{{if.Heading}} {{.Heading}} {{else}} DeMo - (Default Heading) {{end}}</h2> <!-- Implementing IF ELSE example -->
+    <li><b>Name</b>: {{.Name}}</li>
+    <li><b>Country</b>: {{.Country}}</li>
+
+</div>
+</body>
+</html>
