@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import math, random
-from typing import List
 import cairo
 import sys
 from enum import Enum, unique
@@ -9,68 +8,107 @@ from enum import Enum, unique
 @unique
 class pathShape(Enum):
     STRAIGHT = 0
-    CURVED = 1
+    ARKED = 1
+    NEGATIVE_ARKED = 2
 
 #set defaults
 PATH = pathShape.STRAIGHT
-WIDTH, HEIGHT, PIXEL_SCALE, POINTS = 3, 2, 100, 4
+STROKE_THICKNESS = 0.04
+WIDTH, HEIGHT, PIXEL_SCALE, POINTS, MIN_RAD= 3, 2, 100, 7, 0.5
 FILL, STROKE = "#ff0066", "#ffffff"
 FILL_OPACITY, STROKE_OPACITY = 1,1
+FILENAME = "example.svg"
+
+
 
 def hex_to_rgb(value):
     value = value.lstrip('#')
     return list(int(value[i:i+2], 16) for i in (0, 2, 4))
 
-def create_random_shape(points:int, min_width:int, max_width:int, min_height:int, max_height):
+def get_max_radius_maximal(deg, center, min_width:int, max_width:int, min_height:int, max_height:int):
+    maxlen = min([abs((max_width - center["x"])/math.cos(deg)),
+    abs((min_width - center["x"])/math.cos(deg)),
+    abs((max_height - center["y"])/math.sin(deg)),
+    abs((min_height - center["y"])/math.sin(deg))])
+    return maxlen
+
+def get_max_radius_minimal(deg, center, min_width:int, max_width:int, min_height:int, max_height:int):
+    return min([max_width - center["x"], center["x"] - min_width, max_height - center["y"], center["y"] - min_height])
+
+def create_random_shape(points:int, min_width:int, max_width:int, min_height:int, max_height, min_radius = 0.5, max_radius_maximal = True):
     l = []
-    center = { "x":random.uniform(min_width, max_width), "y":random.uniform(min_height,max_height)}
-    current_point = { "x":random.uniform(min_width, max_width), "y":random.uniform(min_height,max_height)}
-    last_point = None
+    degs = []
     for i in range(points):
-        l.append(current_point)
-        if last_point is None:
-            current_point = { "x":random.uniform(min_width, max_width), "y":random.uniform(min_height,max_height)}
+        if i == 0:
+            degs.append(random.uniform(math.pi/points, 2*math.pi/ points))
         else:
-            minw, maxw, minh, maxh = min_width, max_width, min_height, max_height
-            if last_point["x"] >= max_width/2:
-                maxw = last_point["x"]
-            else:
-                minw = last_point["x"]
-            if last_point["y"] >= max_height/2:
-                maxh = last_point["y"]
-            else:
-                minh = last_point["y"]
-            current_point = { "x":random.uniform(minw, maxw), "y":random.uniform(minh, maxh)}
-        last_point = current_point
+            degs.append(random.uniform(degs[i-1] + 0.1, 2*(i + 1)*math.pi/ points))
+
+    degs.sort()
+    center = { "x":(max_width-min_width)/ 2, "y":(max_height-min_height)/2 }
+    #x=Cx+(cos(d/(180/PI))
+    #y=Cy+(sin(d/(180/PI))
+    last_deg = degs[points-1]
+    for d in degs:
+        if max_radius_maximal == True:
+            maxlen = get_max_radius_maximal(d, center, min_width, max_width, min_height, max_height)
+        else:
+            maxlen = get_max_radius_minimal(d, center, min_width, max_width, min_height, max_height)
+        len = random.uniform(min_radius, maxlen)
+        l.append({
+            "x":(center["x"] + len * math.cos(d)),
+            "y":(center["y"] + len * math.sin(d)),
+            "center": center,
+            "radius": len,
+            "end_rad": d,
+            "start_rad": last_deg,
+        })
+        last_deg = d
     return l
 
-def draw_random_straight_shape(ctx, points:int, min_width:int, max_width:int, min_height:int, max_height):
-    shape = create_random_shape(points, min_width, max_width, min_height, max_height)
+def draw_random_straight_shape(ctx, points:int, min_width:int, max_width:int, min_height:int, max_height, min_radius):
+    shape = create_random_shape(points, min_width, max_width, min_height, max_height, min_radius)
     ctx.move_to(shape[0]["x"], shape[0]["y"])
     for index in range(1, len(shape)):
         ctx.line_to(shape[index]["x"], shape[index]["y"])
     ctx.close_path()
 
-surface = cairo.ImageSurface(cairo.FORMAT_RGB24,
+def draw_random_arked_shape(ctx, points:int, min_width:int, max_width:int, min_height:int, max_height):
+    shape = create_random_shape(points, min_width, max_width, min_height, max_height,0,False )
+    ctx.move_to(shape[0]["x"], shape[0]["y"])
+    for index in range(1, len(shape)):
+        ctx.arc(shape[index]["center"]["x"], shape[index]["center"]["y"], shape[index]["radius"], shape[index]["start_rad"], shape[index]["end_rad"])
+    ctx.close_path()
+
+def draw_random_negative_arked_shape(ctx, points:int, min_width:int, max_width:int, min_height:int, max_height):
+    shape = create_random_shape(points, min_width, max_width, min_height, max_height,0,False)
+    ctx.move_to(shape[0]["x"], shape[0]["y"])
+    for index in range(1, len(shape)):
+        ctx.arc_negative(shape[index]["center"]["x"], shape[index]["center"]["y"], shape[index]["radius"], shape[index]["start_rad"], shape[index]["end_rad"])
+    ctx.close_path()
+
+
+surface = cairo.SVGSurface(FILENAME,
                              WIDTH*PIXEL_SCALE,
                              HEIGHT*PIXEL_SCALE)
 ctx = cairo.Context(surface)
 ctx.scale(PIXEL_SCALE, PIXEL_SCALE)
 
 ctx.rectangle(0, 0, WIDTH, HEIGHT)
-ctx.set_source_rgba(1.0, 1.0, 1.0, 0.0)
+ctx.set_source_rgba(0,0,0,0)
 ctx.fill()
 
 # Drawing code
-draw_random_straight_shape(ctx, POINTS, 0,WIDTH, 0,HEIGHT)
+draw_random_negative_arked_shape(ctx, POINTS, 0,WIDTH, 0,HEIGHT)
 
-ctx.set_source_rgb(1, 0.5, 0)
+fill = hex_to_rgb(FILL)
+ctx.set_source_rgba(fill[0]/255, fill[1]/255, fill[2]/255, FILL_OPACITY)
 ctx.fill_preserve()
 
-ctx.set_source_rgb(1, 1, 0)
-ctx.set_line_width(0.04)
+stroke = hex_to_rgb(STROKE)
+ctx.set_source_rgba(stroke[0]/255, stroke[1]/255, stroke[2]/255, STROKE_OPACITY)
+ctx.set_line_width(STROKE_THICKNESS)
 ctx.stroke()
 
 # End of drawing code
-
-surface.write_to_png("example.png")  # Output to PNG
+surface.finish()
