@@ -12,14 +12,46 @@ class pathShape(Enum):
     NEGATIVE_ARKED = 2
 
 #set defaults
-PATH = pathShape.STRAIGHT
-STROKE_THICKNESS = 0.04
-WIDTH, HEIGHT, PIXEL_SCALE, POINTS, MIN_RAD= 3, 2, 100, 7, 0.5
-FILL, STROKE = "#ff0066", "#ffffff"
-FILL_OPACITY, STROKE_OPACITY = 1,1
-FILENAME = "example.svg"
+argSystem = {
+    "PATH" : pathShape.STRAIGHT ,
+    "STROKE_THICKNESS" : 0.04,
+    "WIDTH" : 3.0,
+    "HEIGHT" : 2.0,
+    "PIXEL_SCALE" : 100,
+    "POINTS" : 7,
+    "MIN_RAD" : 0.5,
+    "FILL" : "#ff0066",
+    "STROKE": "#ffffff",
+    "FILL_OPACITY": 1.0,
+    "STROKE_OPACITY":1.0,
+    "FILE": sys.stdout.buffer
+}
+for i in range(1,len(sys.argv)):
+    [subject, value] = sys.argv[i].split(":")
+    if value is None:
+        continue
+    upper = subject.strip().upper()
+    if upper == "PATH":
+        if value == str(1) or value.upper() == "ARKED":
+            argSystem["PATH"] = pathShape.ARKED
+        elif value == str(2) or value.upper() == "NEGATIVE_ARKED":
+            argSystem["PATH"] = pathShape.NEGATIVE_ARKED
+        else:
+            argSystem["PATH"] = pathShape.STRAIGHT
+    elif upper == "FILE" or upper == "FILL" or upper == "STROKE":
+        argSystem[upper] = value
+    elif upper == "POINTS":
+        argSystem[upper] = int(value)
+    else:
+        argSystem[upper] = float(value)
 
-
+#set defaults
+PATH = argSystem["PATH"]
+STROKE_THICKNESS = argSystem["STROKE_THICKNESS"]
+WIDTH, HEIGHT, PIXEL_SCALE, POINTS, MIN_RAD= argSystem["WIDTH"], argSystem["HEIGHT"], argSystem["PIXEL_SCALE"], argSystem["POINTS"], argSystem["MIN_RAD"]
+FILL, STROKE = argSystem["FILL"], argSystem["STROKE"]
+FILL_OPACITY, STROKE_OPACITY = argSystem["FILL_OPACITY"], argSystem["STROKE_OPACITY"]
+FILE = argSystem["FILE"]
 
 def hex_to_rgb(value):
     value = value.lstrip('#')
@@ -73,22 +105,22 @@ def draw_random_straight_shape(ctx, points:int, min_width:int, max_width:int, mi
         ctx.line_to(shape[index]["x"], shape[index]["y"])
     ctx.close_path()
 
-def draw_random_arked_shape(ctx, points:int, min_width:int, max_width:int, min_height:int, max_height):
-    shape = create_random_shape(points, min_width, max_width, min_height, max_height,0,False )
+def draw_random_arked_shape(ctx, points:int, min_width:int, max_width:int, min_height:int, max_height, min_radius):
+    shape = create_random_shape(points, min_width, max_width, min_height, max_height,min_radius,False )
     ctx.move_to(shape[0]["x"], shape[0]["y"])
     for index in range(1, len(shape)):
         ctx.arc(shape[index]["center"]["x"], shape[index]["center"]["y"], shape[index]["radius"], shape[index]["start_rad"], shape[index]["end_rad"])
     ctx.close_path()
 
-def draw_random_negative_arked_shape(ctx, points:int, min_width:int, max_width:int, min_height:int, max_height):
-    shape = create_random_shape(points, min_width, max_width, min_height, max_height,0,False)
+def draw_random_negative_arked_shape(ctx, points:int, min_width:int, max_width:int, min_height:int, max_height, min_radius):
+    shape = create_random_shape(points, min_width, max_width, min_height, max_height,min_radius,False)
     ctx.move_to(shape[0]["x"], shape[0]["y"])
     for index in range(1, len(shape)):
         ctx.arc_negative(shape[index]["center"]["x"], shape[index]["center"]["y"], shape[index]["radius"], shape[index]["start_rad"], shape[index]["end_rad"])
     ctx.close_path()
 
 
-surface = cairo.SVGSurface(FILENAME,
+surface = cairo.SVGSurface(FILE,
                              WIDTH*PIXEL_SCALE,
                              HEIGHT*PIXEL_SCALE)
 ctx = cairo.Context(surface)
@@ -99,7 +131,12 @@ ctx.set_source_rgba(0,0,0,0)
 ctx.fill()
 
 # Drawing code
-draw_random_negative_arked_shape(ctx, POINTS, 0,WIDTH, 0,HEIGHT)
+if PATH == pathShape.NEGATIVE_ARKED:
+    draw_random_negative_arked_shape(ctx, POINTS, 0,WIDTH, 0,HEIGHT, MIN_RAD)
+elif PATH == pathShape.ARKED:
+    draw_random_arked_shape(ctx, POINTS, 0,WIDTH, 0,HEIGHT, MIN_RAD)
+else:
+    draw_random_straight_shape(ctx, POINTS, 0, WIDTH, 0, HEIGHT, MIN_RAD)
 
 fill = hex_to_rgb(FILL)
 ctx.set_source_rgba(fill[0]/255, fill[1]/255, fill[2]/255, FILL_OPACITY)
