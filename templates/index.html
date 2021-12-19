@@ -3,15 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <title>NepCodex Demo - {{.PageTitle}}</title>
-    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="/static/styles/styles.css">
+    <script src="/static/js/index.js" type= "text/javascript"></script>
 </head>
 <body>
-<h1>Hello Demo App </h1>
-<div>
-    <h2>{{if.Heading}} {{.Heading}} {{else}} DeMo - (Default Heading) {{end}}</h2> <!-- Implementing IF ELSE example -->
-    <li><b>Name</b>: {{.Name}}</li>
-    <li><b>Country</b>: {{.Country}}</li>
-
-</div>
+    <h1>Hello Demo App </h1>
+    <div>
+        <h2>{{if.Heading}} {{.Heading}} {{else}} DeMo - (Default Heading) {{end}}</h2> <!-- Implementing IF ELSE example -->
+        <li><b>Name</b>: {{.Name}}</li>
+        <li><b>Country</b>: {{.Country}}</li>
+        <h2>Let's Create a Color Picker</h2>
+        <div class="container">
+            <canvas id="color-picker"></canvas>
+            <div class="info">
+                <h3>Selected Color</h3> 
+                <div class="selected" ></div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
