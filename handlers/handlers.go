@@ -61,14 +61,6 @@ func ShapeGenHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, e.Generate())
 }
 
-// Similarly, for '/users'
-func UserHandler(w http.ResponseWriter, r *http.Request) {
-	_, err := fmt.Fprint(w, "Hello User From Users Page, NepCodex.com")
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-	}
-}
-
 func errorResponse(w http.ResponseWriter, message string, httpStatusCode int) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(httpStatusCode)
