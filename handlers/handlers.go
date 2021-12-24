@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -25,7 +27,15 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ShapeGenHandler(w http.ResponseWriter, r *http.Request) {
-	Shape := &app.Shape{
+	headerContentTtype := r.Header.Get("Content-Type")
+	if headerContentTtype != "application/json" {
+		errorResponse(w, "Content Type is not application/json", http.StatusUnsupportedMediaType)
+		return
+	}
+	var e app.Shape
+	var unmarshalErr *json.UnmarshalTypeError
+
+	/*Shape := &app.Shape{
 		StrokeThickness: 1.0,
 		Points:          6,
 		Fill:            app.Color{Hex: "#005533", Opacity: 1.0},
@@ -34,8 +44,21 @@ func ShapeGenHandler(w http.ResponseWriter, r *http.Request) {
 		MinRad:          2.0,
 		SizeCon:         app.SizeConstraint{Width: 4, Height: 4, PixelScale: 100},
 	}
+	*/
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
+	err := decoder.Decode(&e)
+	if err != nil {
+		if errors.As(err, &unmarshalErr) {
+			errorResponse(w, "Bad Request. Wrong Type provided for field "+unmarshalErr.Field, http.StatusBadRequest)
+		} else {
+			errorResponse(w, "Bad Request "+err.Error(), http.StatusBadRequest)
+		}
+		return
+	}
+
 	w.Header().Set("Content-Type", "text/plain")
-	fmt.Fprint(w, Shape.Generate())
+	fmt.Fprint(w, e.Generate())
 }
 
 // Similarly, for '/users'
@@ -44,4 +67,13 @@ func UserHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
+}
+
+func errorResponse(w http.ResponseWriter, message string, httpStatusCode int) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(httpStatusCode)
+	resp := make(map[string]string)
+	resp["message"] = message
+	jsonResp, _ := json.Marshal(resp)
+	w.Write(jsonResp)
 }
