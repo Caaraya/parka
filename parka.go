@@ -16,6 +16,7 @@ func main() {
 	// Handling Routes
 	http.HandleFunc("/", handlers.IndexHandler)
 	http.HandleFunc("/users", handlers.UserHandler)
+	http.HandleFunc("/shape", handlers.ShapeGenHandler)
 	// Handle Static Content
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
