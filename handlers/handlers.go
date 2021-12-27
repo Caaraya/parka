@@ -18,12 +18,53 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	p := &Page{
-		PageTitle: "Demo Home Page",
-		Heading:   "something else", // Change this to something else and see the results in html page
-		Name:      "NepCodex",
-		Country:   "Nepal",
+		Selected: app.Shape{
+			StrokeThickness: 1.0,
+			Points:          4,
+			Fill: app.Color{
+				Hex:     "#662211",
+				Opacity: 1.0,
+			},
+			Stroke: app.Color{
+				Hex:     "#772233",
+				Opacity: 0.7,
+			},
+			Path:   "ARKED",
+			MinRad: 1.0,
+			SizeCon: app.SizeConstraint{
+				Width:      4.0,
+				Height:     4.0,
+				PixelScale: 100,
+			},
+		},
 	}
 	renderTemplate(w, "index", p)
+}
+
+func ShapesGenHandler(w http.ResponseWriter, r *http.Request) {
+	headerContentTtype := r.Header.Get("Content-Type")
+	if headerContentTtype != "application/json" {
+		errorResponse(w, "Content Type is not application/json", http.StatusUnsupportedMediaType)
+		return
+	}
+	var e []app.Shape
+	var unmarshalErr *json.UnmarshalTypeError
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
+	err := decoder.Decode(&e)
+	if err != nil {
+		if errors.As(err, &unmarshalErr) {
+			errorResponse(w, "Bad Request. Wrong Type provided for field "+unmarshalErr.Field, http.StatusBadRequest)
+		} else {
+			errorResponse(w, "Bad Request "+err.Error(), http.StatusBadRequest)
+		}
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/plain")
+	for k, v := range e {
+		fmt.Fprintln(w, k, v.Generate())
+	}
 }
 
 func ShapeGenHandler(w http.ResponseWriter, r *http.Request) {
@@ -35,16 +76,6 @@ func ShapeGenHandler(w http.ResponseWriter, r *http.Request) {
 	var e app.Shape
 	var unmarshalErr *json.UnmarshalTypeError
 
-	/*Shape := &app.Shape{
-		StrokeThickness: 1.0,
-		Points:          6,
-		Fill:            app.Color{Hex: "#005533", Opacity: 1.0},
-		Stroke:          app.Color{Hex: "#ffffff", Opacity: 1.0},
-		Path:            "STRAIGHT",
-		MinRad:          2.0,
-		SizeCon:         app.SizeConstraint{Width: 4, Height: 4, PixelScale: 100},
-	}
-	*/
 	decoder := json.NewDecoder(r.Body)
 	decoder.DisallowUnknownFields()
 	err := decoder.Decode(&e)

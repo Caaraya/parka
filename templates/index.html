@@ -2,26 +2,57 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>NepCodex Demo - {{.PageTitle}}</title>
+    <title>Shape Generator</title>
     <link rel="stylesheet" href="/static/styles/styles.css">
     <script src="/static/js/index.js" type= "text/javascript"></script>
 </head>
 <body>
     <h1>Hello Demo App </h1>
     <div>
-        <h2>{{if.Heading}} {{.Heading}} {{else}} DeMo - (Default Heading) {{end}}</h2> <!-- Implementing IF ELSE example -->
-        <li><b>Name</b>: {{.Name}}</li>
-        <li><b>Country</b>: {{.Country}}</li>
         <h2>Let's Create a Color Picker</h2>
         <button class="collapsible">inputs</button>
         <div class="container content">
             <canvas id="color-picker"></canvas>
-            <div class="info">
-                <h3>Selected Color</h3> 
-                <div class="selected" ></div>
-            </div>
+            <select id="select-color" name="select-color">
+                <option id="Fill">Fill</option>
+                <option id="Stroke">Stroke</option>
+            </select>
             <div class="inputs">
-    
+                <label for="select-stroke-thickness">Stroke Thickness:</label>
+                <input type="number" id="select-stroke-thickness" value="{{.Selected.StrokeThickness}}"/>
+                <label for="select-points">Points:</label>
+                <input type="number" id="select-points" value="{{.Selected.Points}}"/>
+                <label for="select-fill">Fill:</label>
+                <span id="select-fill">
+                    <span class="select-fill-color"></span>
+                    <input type="number" id="select-fill-opacity" value="{{.Selected.Fill.Opacity}}"/>
+                </span>
+                <label for="select-stroke">Stroke:</label>
+                <span id="select-stroke">
+                    <span class="select-stroke-color"></span>
+                    <input type="number" id="select-stroke-opacity" value="{{.Selected.Stroke.Opacity}}"/>
+                </span>
+                <label for="select-path">Path:</label>
+                <select id="select-path" name="select-path">
+                    <option id="STRAIGHT">STRAIGHT</option>
+                    <option id="ARKED">ARKED</option>
+                    <option id="NEGATIVE_ARKED">NEGATIVE_ARKED</option>
+                </select>
+                <label for="select-minimum-radius">Minimum Radius:</label>
+                <input type="number" id="select-minimum-radius" value="{{.Selected.MinRad}}"/>
+                <label for="select-width">Width:</label>
+                <input type="number" id="select-width" value="{{.Selected.SizeCon.Width}}"/>
+                <label for="select-height">Height:</label>
+                <input type="number" id="select-height" value="{{.Selected.SizeCon.Height}}"/>
+                <label for="select-pixel-scale">Pixel Scale:</label>
+                <input type="number" id="select-pixel-scale" value="{{.Selected.SizeCon.PixelScale}}"/>
+            </div>
+            <div class="outputs">
+                <button id="single-item">Generate</button>
+                <button id="add-to-queue">Add to queue</button>
+                <li id="queue"></li>
+                <button id="generate-from-queue">Generate from queue</button>
+                <button id="clear-queue">Clear Queue</button>
             </div>
         </div>
     </div>

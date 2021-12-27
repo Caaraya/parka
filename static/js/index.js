@@ -94,10 +94,16 @@ document.addEventListener("DOMContentLoaded", function(event){
     //On Circle position change 
     picker.onChange((color) => {
     //Get the preview DOM element
-    let selected = document.getElementsByClassName("selected")[0];
+    let selected_color_picker = document.getElementsByName("select-color")[0];
+    let select_fill = document.getElementsByClassName("select-fill-color")[0];
+    let select_stroke = document.getElementsByClassName("select-stroke-color")[0];
     //Change it's backagroundColor to the current color (rgb CSS function)
-    selected.style.backgroundColor = `rgb(${color.r}, ${color.g}, ${color.b})`;
-    
+    if(selected_color_picker.value == "Fill"){
+      select_fill.style.backgroundColor = `rgb(${color.r}, ${color.g}, ${color.b})`;
+    } else {
+      select_stroke.style.backgroundColor = `rgb(${color.r}, ${color.g}, ${color.b})`;
+    }
+      
   });
   var coll = document.getElementsByClassName("collapsible");
   var i;

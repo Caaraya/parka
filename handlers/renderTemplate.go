@@ -3,6 +3,8 @@ package handlers
 import (
 	"html/template"
 	"net/http"
+
+	"github.com/caaraya/parka-server/app"
 )
 
 // Parse template files
@@ -10,10 +12,7 @@ var templates = template.Must(template.ParseFiles("templates/index.html"))
 
 // Declaration of struct needed for the template
 type Page struct {
-	PageTitle string
-	Heading   string
-	Name      string
-	Country   string
+	Selected app.Shape
 }
 
 // A custom render function which takes the filename of template html file

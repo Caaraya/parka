@@ -14,6 +14,10 @@ html, body {
   text-align: center;
 }
 
+input {
+  width: 50px;
+}
+
 .container {
   width: 100%;
   height: 100%;
@@ -34,6 +38,22 @@ html, body {
   height: 50px;
   border-radius: 100%;
   border: 2px solid rgba(15, 15, 15, 0.2);
+}
+
+.select-stroke-color {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(15, 15, 15, 0.2);
+  display:inline-block;
+}
+
+.select-fill-color {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(15, 15, 15, 0.2);
+  display:inline-block;
 }
 /* Style the button that is used to open and close the collapsible content */
 .collapsible {
