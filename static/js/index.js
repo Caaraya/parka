@@ -122,5 +122,23 @@ document.addEventListener("DOMContentLoaded", function(event){
   //NOTE: Remeber we are return a color object that has a three properties(Red, Green and Blue)
 });
 
+function generateSingleItem(shape) {
 
+}
 
+function generateMultipleItems() {
+
+}
+
+function clear() {
+    let q = document.getElementById("queue")
+    q.innerHTML = ''
+}
+
+function addToQueue(shape) {
+    let q = document.getElementById("queue")
+    let li = document.createElement("li")
+    li.id = "queue-item-shape"
+    li.textContent = JSON.stringify(shape)
+    q.appendChild(li)
+}

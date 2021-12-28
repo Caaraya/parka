@@ -33,7 +33,7 @@
                     <input type="number" id="select-stroke-opacity" value="{{.Selected.Stroke.Opacity}}"/>
                 </span>
                 <label for="select-path">Path:</label>
-                <select id="select-path" name="select-path">
+                <select id="select-path" name="select-path" value="{{.Selected.Path}}">
                     <option id="STRAIGHT">STRAIGHT</option>
                     <option id="ARKED">ARKED</option>
                     <option id="NEGATIVE_ARKED">NEGATIVE_ARKED</option>
@@ -48,13 +48,16 @@
                 <input type="number" id="select-pixel-scale" value="{{.Selected.SizeCon.PixelScale}}"/>
             </div>
             <div class="outputs">
-                <button id="single-item">Generate</button>
-                <button id="add-to-queue">Add to queue</button>
-                <li id="queue"></li>
-                <button id="generate-from-queue">Generate from queue</button>
-                <button id="clear-queue">Clear Queue</button>
+                <button id="single-item" onclick="generateSingleItem()">Generate</button>
+                <button id="add-to-queue" onclick="addToQueue()">Add to queue</button>
+                <ol id="queue"></ol>
+                <button onclick="generateMultipleItems()" id="generate-from-queue">Generate from queue</button>
+                <button onclick="clearQueue()" id="clear-queue">Clear Queue</button>
             </div>
         </div>
+        <canvas id="output">
+
+        </canvas>
     </div>
 </body>
 </html>
