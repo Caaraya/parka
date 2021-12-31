@@ -57,6 +57,12 @@ def hex_to_rgb(value):
     value = value.lstrip('#')
     return list(int(value[i:i+2], 16) for i in (0, 2, 4))
 
+def get_rgb(value):
+    value = value.lstrip('rgb(')
+    value = value.rstrip(')')
+    value = value.split(',')
+    return list(int(value[i:i+2].strip()) for i in range(3))
+
 def get_max_radius_maximal(deg, center, min_width:int, max_width:int, min_height:int, max_height:int):
     maxlen = min([abs((max_width - center["x"])/math.cos(deg)),
     abs((min_width - center["x"])/math.cos(deg)),
@@ -138,11 +144,17 @@ elif PATH == pathShape.ARKED:
 else:
     draw_random_straight_shape(ctx, POINTS, 0, WIDTH, 0, HEIGHT, MIN_RAD)
 
-fill = hex_to_rgb(FILL)
+if ('rgb' in FILL):
+    fill = get_rgb(FILL)
+else:
+    fill = hex_to_rgb(FILL)
 ctx.set_source_rgba(fill[0]/255, fill[1]/255, fill[2]/255, FILL_OPACITY)
 ctx.fill_preserve()
 
-stroke = hex_to_rgb(STROKE)
+if ('rgb' in STROKE):
+    stroke = get_rgb(STROKE)
+else:
+    stroke = hex_to_rgb(STROKE)
 ctx.set_source_rgba(stroke[0]/255, stroke[1]/255, stroke[2]/255, STROKE_OPACITY)
 ctx.set_line_width(STROKE_THICKNESS)
 ctx.stroke()

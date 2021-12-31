@@ -24,12 +24,12 @@
                 <input type="number" id="select-points" value="{{.Selected.Points}}"/>
                 <label for="select-fill">Fill:</label>
                 <span id="select-fill">
-                    <span class="select-fill-color"></span>
+                    <span id="select-fill-color" class="select-fill-color" style='background-color:{{.Selected.Fill.Hex}}'></span>
                     <input type="number" id="select-fill-opacity" value="{{.Selected.Fill.Opacity}}"/>
                 </span>
                 <label for="select-stroke">Stroke:</label>
                 <span id="select-stroke">
-                    <span class="select-stroke-color"></span>
+                    <span id="select-stroke-color" class="select-stroke-color" style='background-color:{{.Selected.Stroke.Hex}}'></span>
                     <input type="number" id="select-stroke-opacity" value="{{.Selected.Stroke.Opacity}}"/>
                 </span>
                 <label for="select-path">Path:</label>

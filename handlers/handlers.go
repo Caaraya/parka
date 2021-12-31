@@ -22,7 +22,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 			StrokeThickness: 1.0,
 			Points:          4,
 			Fill: app.Color{
-				Hex:     "#662211",
+				Hex:     "#2344ff",
 				Opacity: 1.0,
 			},
 			Stroke: app.Color{
