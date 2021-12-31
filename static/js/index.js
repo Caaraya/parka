@@ -142,7 +142,9 @@ function collectSelectedObject() {
     var value_inputs = ['input', 'select'];
     let element
     if(input && value_inputs.indexOf(input.tagName.toLowerCase()) !== -1) {
-      element = input.value
+      number = ['select-points', 'select-pixel-scale'].indexOf(key) !== -1 ? parseInt : parseFloat
+      element = input.type.toLowerCase()=="number" ? number(input.value): input.value
+     
     } else if (input && input.tagName.toLowerCase() == 'span') {
       element = input.style.backgroundColor;
     }
@@ -199,9 +201,13 @@ function generateMultipleItems() {
   };
   xmlhttp.open("POST", "/shapes", true);
   xmlhttp.responseType = 'document'
-  xmlhttp.setRequestHeader('Content-Type', 'application/json');
+  xmlhttp.setRequestHeader('Content-Type', 'application/json')
   let q = document.getElementById('queue')
-  xmlhttp.send(JSON.stringify(q.children));
+  let li = []
+  q.childNodes.forEach(function(child){
+    li.push(JSON.parse(child.innerHTML))
+  })
+  xmlhttp.send(JSON.stringify(li));
 }
 
 function clearQueue() {

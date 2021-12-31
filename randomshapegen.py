@@ -61,7 +61,7 @@ def get_rgb(value):
     value = value.lstrip('rgb(')
     value = value.rstrip(')')
     value = value.split(',')
-    return list(int(value[i:i+2].strip()) for i in range(3))
+    return list(int(value[i].strip()) for i in range(3))
 
 def get_max_radius_maximal(deg, center, min_width:int, max_width:int, min_height:int, max_height:int):
     maxlen = min([abs((max_width - center["x"])/math.cos(deg)),
