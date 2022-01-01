@@ -189,14 +189,19 @@ function generateMultipleItems() {
   if (window.XMLHttpRequest) {
     // code for modern browsers
     xmlhttp = new XMLHttpRequest();
- } else {
+  } else {
     // code for old IE browsers
     xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-}
+  }
   xmlhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
         // Typical action to be performed when the document is ready:
-        alert(this.response);
+        list = this.responseText.split("\n\n")
+        list.forEach(function(item) {
+          if(item.length > 0) {
+            addOutputShape(item)
+          }
+        })
       }
   };
   xmlhttp.open("POST", "/shapes", true);
@@ -223,7 +228,7 @@ function addOutputShape(shape) {
 }
 
 function clearShapeOutput() {
-  let q = document.getElementById('shape-output')
+  let q = document.getElementById('output')
   if (!q.classList.contains('no-output'))
     q.classList.add('no-output')
   q.innerHTML = ''

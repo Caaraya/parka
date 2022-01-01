@@ -62,8 +62,8 @@ func ShapesGenHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "text/plain")
-	for k, v := range e {
-		fmt.Fprintln(w, k, v.Generate())
+	for v := range e {
+		fmt.Fprintln(w, e[v].Generate())
 	}
 }
 
