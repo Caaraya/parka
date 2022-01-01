@@ -176,11 +176,11 @@ function generateSingleItem() {
   xmlhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
         // Typical action to be performed when the document is ready:
-        document.getElementById("demo").innerHTML = xmlhttp.responseText;
+        addOutputShape(this.responseText)
       }
   };
   xmlhttp.open("POST", "/shape", true);
-  xmlhttp.responseType = 'document'
+  xmlhttp.responseType = 'Text'
   xmlhttp.setRequestHeader('Content-Type', 'application/json');
   xmlhttp.send(JSON.stringify(this.collectSelectedObject()));
 }
@@ -196,11 +196,11 @@ function generateMultipleItems() {
   xmlhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
         // Typical action to be performed when the document is ready:
-        document.getElementById("demo").innerHTML = xmlhttp.responseText;
+        alert(this.response);
       }
   };
   xmlhttp.open("POST", "/shapes", true);
-  xmlhttp.responseType = 'document'
+  xmlhttp.responseType = 'Text'
   xmlhttp.setRequestHeader('Content-Type', 'application/json')
   let q = document.getElementById('queue')
   let li = []
@@ -209,6 +209,26 @@ function generateMultipleItems() {
   })
   xmlhttp.send(JSON.stringify(li));
 }
+
+function addOutputShape(shape) {
+  let q = document.getElementById('shape-output')
+  if (q.classList.contains('no-output'))
+    q.classList.remove('no-output')
+  var img = document.createElement('img');
+  var svg64 = btoa(shape);
+  var b64Start = 'data:image/svg+xml;base64,';
+  var image64 = b64Start + svg64;
+  img.src = image64;
+  q.appendChild(img)
+}
+
+function clearShapeOutput() {
+  let q = document.getElementById('shape-output')
+  if (!q.classList.contains('no-output'))
+    q.classList.add('no-output')
+  q.innerHTML = ''
+}
+
 
 function clearQueue() {
     let q = document.getElementById('queue')
