@@ -17,6 +17,7 @@ func main() {
 	http.HandleFunc("/", handlers.IndexHandler)
 	http.HandleFunc("/shape", handlers.ShapeGenHandler)
 	http.HandleFunc("/shapes", handlers.ShapesGenHandler)
+	http.HandleFunc("/animations", handlers.LoadAnimations)
 	// Handle Static Content
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 

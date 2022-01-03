@@ -16,13 +16,14 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
+	//anim := app.GetDefault()
 
 	p := &Page{
 		Selected: app.Shape{
 			StrokeThickness: 1.0,
 			Points:          4,
 			Fill: app.Color{
-				Hex:     "#2344ff",
+				Hex:     "#ccccccc",
 				Opacity: 1.0,
 			},
 			Stroke: app.Color{
@@ -37,7 +38,9 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 				PixelScale: 100,
 			},
 		},
+		//Animations: []app.Animation{anim},
 	}
+
 	renderTemplate(w, "index", p)
 }
 
@@ -90,6 +93,41 @@ func ShapeGenHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/plain")
 	fmt.Fprint(w, e.Generate())
+}
+
+func LoadAnimations(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case "GET":
+		anim := []app.Animation{app.GetDefault()}
+		jsonResp, _ := json.Marshal(anim)
+		w.Write(jsonResp)
+	case "POST":
+		headerContentTtype := r.Header.Get("Content-Type")
+		if headerContentTtype != "application/json" {
+			errorResponse(w, "Content Type is not application/json", http.StatusUnsupportedMediaType)
+			return
+		}
+		var e app.Animation
+		var unmarshalErr *json.UnmarshalTypeError
+
+		decoder := json.NewDecoder(r.Body)
+		decoder.DisallowUnknownFields()
+		err := decoder.Decode(&e)
+		if err != nil {
+			if errors.As(err, &unmarshalErr) {
+				errorResponse(w, "Bad Request. Wrong Type provided for field "+unmarshalErr.Field, http.StatusBadRequest)
+			} else {
+				errorResponse(w, "Bad Request "+err.Error(), http.StatusBadRequest)
+			}
+			return
+		}
+
+		w.Header().Set("Content-Type", "text/plain")
+		fmt.Fprint(w, e.GenerateGIF())
+		fmt.Fprint(w, e.GenerateSpriteSheet())
+	default:
+		fmt.Fprintf(w, "Sorry, only GET and POST methods are supported.")
+	}
 }
 
 func errorResponse(w http.ResponseWriter, message string, httpStatusCode int) {

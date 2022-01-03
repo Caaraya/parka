@@ -85,9 +85,37 @@ class Picker {
     }
 
 }
+class Animation {
+  constructor(animation) {
+    this.Name = animation.Name
+    this.Frames = {}
+    this.Frames.collection = animation.Frames
+    this.Frames.height = animation.FrameHeight
+    this.Frames.width = animation.FrameWidth
+  }
+}
+class Animations {
+  constructor(animations) {
+    let anims = JSON.parse(animations)
+    animations = []
+    anims.forEach(function(anim){
+      animations.push(new Animation(anim))
+    })
+    this.animations = animations
+  }
+  getAnimationNames() {
+    let animnames = []
+    this.animations.forEach(function(anim) {
+      animnames.push(anim.Name)
+    })
+    return animnames
+  }
+}
 document.addEventListener('DOMContentLoaded', function(event){
     //Create an instance passing it the canvas, width and height
     let picker = new Picker(document.getElementById('color-picker'), 250, 220);
+
+    getAnimations()
 
     //Draw 
     picker.draw();
@@ -121,6 +149,27 @@ document.addEventListener('DOMContentLoaded', function(event){
   }
   //NOTE: Remeber we are return a color object that has a three properties(Red, Green and Blue)
 });
+
+function getAnimations() {
+  if (window.XMLHttpRequest) {
+    // code for modern browsers
+    xmlhttp = new XMLHttpRequest();
+ } else {
+    // code for old IE browsers
+    xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+  }
+  xmlhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        // Typical action to be performed when the document is ready:
+        animations = new Animations(this.responseText)
+        fillAnimations(animations)
+      }
+  };
+  xmlhttp.open("GET", "/animations", true);
+  xmlhttp.responseType = 'Text'
+  xmlhttp.setRequestHeader('Content-Type', 'application/json');
+  xmlhttp.send(JSON.stringify(this.collectSelectedObject()));
+}
 
 function collectSelectedObject() {
   inputs = new Map([
@@ -163,6 +212,21 @@ function collectSelectedObject() {
     }
   })
   return result
+}
+
+function fillAnimations(animations) {
+  this.animations = animations
+  select = document.getElementById("select-animation")
+  this.animations.getAnimationNames().forEach(function(animname) {
+    node = document.createElement("option")
+    node.id = animname
+    node.value = animname
+    node.textContent = animname
+    select.appendChild(node)
+  })
+  if(select.childElementCount > 0) {
+    select.value = select.children[0].value
+  }
 }
 
 function generateSingleItem() {
@@ -220,17 +284,39 @@ function addOutputShape(shape) {
   if (q.classList.contains('no-output'))
     q.classList.remove('no-output')
   var img = document.createElement('img');
+  img.classList.add('output-shape')
   var svg64 = btoa(shape);
   var b64Start = 'data:image/svg+xml;base64,';
   var image64 = b64Start + svg64;
   img.src = image64;
   q.appendChild(img)
+  img.addEventListener("click", selectImage)
+}
+
+function selectImage() {
+  if(this.classList.contains('selected-output-shape')) {
+    this.classList.remove('selected-output-shape')
+  } else {
+    this.classList.add('selected-output-shape')
+  }
+  setAnimationDisablement()
+}
+
+function setAnimationDisablement() {
+  let but = document.getElementById('generate-animation')
+  if (len(document.querySelectorAll('.selected-output-shape'))<= 0){
+    but.disabled = true
+    return
+  }
+  but.disabled = false
 }
 
 function clearShapeOutput() {
-  let q = document.getElementById('output')
+  let q = document.getElementById('shape-output')
   if (!q.classList.contains('no-output'))
     q.classList.add('no-output')
+  let but = document.getElementById('generate-animation')
+  but.disabled = true
   q.innerHTML = ''
 }
 
