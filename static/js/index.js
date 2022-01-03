@@ -87,6 +87,7 @@ class Picker {
 }
 class Animation {
   constructor(animation) {
+    this.animationjson = animation
     this.Name = animation.Name
     this.Frames = {}
     this.Frames.collection = animation.Frames
@@ -304,11 +305,12 @@ function selectImage() {
 
 function setAnimationDisablement() {
   let but = document.getElementById('generate-animation')
-  if (len(document.querySelectorAll('.selected-output-shape'))<= 0){
-    but.disabled = true
+  let shapes = document.getElementsByClassName('selected-output-shape')
+  if (shapes.length > 0){
+    but.disabled = false
     return
   }
-  but.disabled = false
+  but.disabled = true
 }
 
 function clearShapeOutput() {
