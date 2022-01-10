@@ -42,34 +42,15 @@ class Picker {
 
     }
     listenForEvents() {
-        let isMouseDown = false;
         const onMouseDown = (e) => {
           let currentX = e.clientX - this.target.offsetLeft;
-          let currentY = e.clientY - this.target.offsetTop;
-          if(currentY > this.pickerCircle.y && currentY < this.pickerCircle.y + this.pickerCircle.width && currentX > this.pickerCircle.x && currentX < this.pickerCircle.x + this.pickerCircle.width) {
-            isMouseDown = true;
-          } else {
-            this.pickerCircle.x = currentX;
-            this.pickerCircle.y = currentY;
-          }
-        }
-        const onMouseMove = (e) => {
-          if(isMouseDown) {
-           let currentX = e.clientX - this.target.offsetLeft;
-           let currentY = e.clientY - this.target.offsetTop;
-            this.pickerCircle.x = currentX;
-            this.pickerCircle.y = currentY;
-          }
-        }
-        const onMouseUp = () => {
-          isMouseDown = false;
+          let currentY = e.offsetY;
+          this.pickerCircle.y = currentY;
+          this.pickerCircle.x = currentX;
         }
         this.target.addEventListener('mousedown', onMouseDown);
-        this.target.addEventListener('mousemove', onMouseMove);
         //Mouse move event on the canvas, call callback passing it the current color 
-        this.target.addEventListener('mousemove', () => this.onChangeCallback(this.getPickedColor()));
-        //Mouse up on the Document     
-        document.addEventListener('mouseup', onMouseUp);
+        this.target.addEventListener('mousedown', () => this.onChangeCallback(this.getPickedColor()));
       }
     onChange(callback) {
         //Save Callback function reference on the class
@@ -94,6 +75,35 @@ class Animation {
     this.Frames.height = animation.FrameHeight
     this.Frames.width = animation.FrameWidth
   }
+
+  setImage(id, image) {
+    this.Frames.collection.forEach(function(frame) {
+      frame.Units.forEach(function (unit) {
+        if (unit.Image.ImageId == id) {
+          unit.Image.Image = image
+        }
+      })
+    })
+    this.animationjson.Frames = this.Frames.collection
+  }
+
+  getImages() {
+    let images = []
+    let ids = []
+    this.Frames.collection.forEach(function(frame) {
+      frame.Units.forEach(function (unit) {
+        if (ids.indexOf(unit.Image.ImageId) < 0) {
+          ids.push(unit.Image.ImageId)
+          images.push(unit.Image)
+        }
+      })
+    })
+    return images
+  }
+
+  getAnimation() {
+    return this.animations
+  }
 }
 class Animations {
   constructor(animations) {
@@ -110,6 +120,15 @@ class Animations {
       animnames.push(anim.Name)
     })
     return animnames
+  }
+  getAnimationFromName(name) {
+    let returned = undefined
+    this.animations.forEach(function(anim) {
+      if(anim.Name == name) {
+        returned = anim
+      }
+    })
+    return returned
   }
 }
 document.addEventListener('DOMContentLoaded', function(event){
@@ -228,6 +247,37 @@ function fillAnimations(animations) {
   if(select.childElementCount > 0) {
     select.value = select.children[0].value
   }
+}
+
+function generateAnimation() {
+  let select = document.getElementById("select-animation")
+  if (!select) return
+  let option = select.selectedOptions[0].value
+  if (!option) return
+  let shapes = document.getElementsByClassName('selected-output-shape')
+  if (!shapes) return
+  let animation = this.animations.getAnimationFromName(option)
+  let images = animation.getImages()
+  for(let y=0;y < images.length;y++){
+    animation.setImage(images[y].ImageId,shapes[y % shapes.length].src)
+  }
+  if (window.XMLHttpRequest) {
+    // code for modern browsers
+    xmlhttp = new XMLHttpRequest();
+  } else {
+      // code for old IE browsers
+      xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+  }
+    xmlhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          // Typical action to be performed when the document is ready:
+          this.responseText
+        }
+    };
+    xmlhttp.open("POST", "/animations", true);
+    xmlhttp.responseType = 'Text'
+    xmlhttp.setRequestHeader('Content-Type', 'application/json');
+    xmlhttp.send(JSON.stringify(animation.animationjson));
 }
 
 function generateSingleItem() {
