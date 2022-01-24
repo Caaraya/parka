@@ -1,6 +1,7 @@
 package app
 
 import (
+	"encoding/json"
 	"fmt"
 	"os/exec"
 	"strconv"
@@ -57,30 +58,6 @@ func (u *Unit) getScale() []float64 {
 		return []float64{u.x_scale, u.y_scale}
 	}
 	return nil
-}
-func (u *Unit) toString() string {
-	unit_str := "IMAGE|" + u.Image.Image
-	unit_str += "IMAGEID|" + strconv.FormatInt(u.Image.ImageId, 10)
-	scale := u.getScale()
-	if len(scale) > 1 {
-		unit_str += "|X_SCALE|" + strconv.FormatFloat(scale[0], 'f', 2, 32)
-		unit_str += "|Y_SCALE|" + strconv.FormatFloat(scale[1], 'f', 2, 32)
-	} else {
-		unit_str += "|SCALE|" + strconv.FormatFloat(scale[0], 'f', 2, 32)
-	}
-	unit_str += "|X|" + strconv.FormatFloat(u.X, 'f', 2, 32)
-	unit_str += "|Y|" + strconv.FormatFloat(u.Y, 'f', 2, 32)
-	return unit_str
-}
-func (f *Frame) toString() string {
-	units_str := ""
-	for i, v := range f.Units {
-		units_str += v.toString()
-		if i != len(f.Units) {
-			units_str += "||"
-		}
-	}
-	return units_str
 }
 
 func GetDefault() Animation {
@@ -157,20 +134,14 @@ func GetDefault() Animation {
 }
 
 func (a Animation) GenerateSpriteSheet() string {
-	frames_str := ""
-	for i, v := range a.Frames {
-		frames_str += v.toString()
-		if i != len(a.Frames) {
-			frames_str += "|||"
-		}
-	}
+	s2, _ := json.Marshal(a.Frames)
 	cmd := exec.Command(
 		"python3",
 		"spriteSheetGen.py",
-		"name:"+a.Name,
-		"sprite_width:"+strconv.FormatFloat(a.FrameWidth, 'f', 2, 32),
-		"sprite_height:"+strconv.FormatFloat(a.FrameHeight, 'f', 2, 32),
-		"Frames:"+frames_str,
+		"name#"+a.Name,
+		"sprite_width#"+strconv.FormatFloat(a.FrameWidth, 'f', 2, 32),
+		"sprite_height#"+strconv.FormatFloat(a.FrameHeight, 'f', 2, 32),
+		"Frames#"+string(s2),
 	)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
@@ -180,20 +151,14 @@ func (a Animation) GenerateSpriteSheet() string {
 }
 
 func (a Animation) GenerateGIF() string {
-	frames_str := ""
-	for i, v := range a.Frames {
-		frames_str += v.toString()
-		if i != len(a.Frames) {
-			frames_str += "|||"
-		}
-	}
+	s2, _ := json.Marshal(a.Frames)
 	cmd := exec.Command(
 		"python3",
 		"spriteGIF.py",
-		"name:"+a.Name,
-		"sprite_width:"+strconv.FormatFloat(a.FrameWidth, 'f', 2, 32),
-		"sprite_height:"+strconv.FormatFloat(a.FrameHeight, 'f', 2, 32),
-		"Frames:"+frames_str,
+		"name#"+a.Name,
+		"sprite_width#"+strconv.FormatFloat(a.FrameWidth, 'f', 2, 32),
+		"sprite_height#"+strconv.FormatFloat(a.FrameHeight, 'f', 2, 32),
+		"Frames#"+string(s2),
 	)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
