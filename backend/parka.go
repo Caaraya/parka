@@ -19,12 +19,12 @@ func main() {
 	http.HandleFunc("/shapes", handlers.ShapesGenHandler)
 	http.HandleFunc("/animations", handlers.LoadAnimations)
 	// Handle Static Content
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	//http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	// Use environment variable "PORT" or otherwise assign
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080"
+		port = "8090"
 		log.Printf("The port is %s", port)
 	}
 
