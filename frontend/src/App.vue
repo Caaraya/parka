@@ -1,17 +1,40 @@
 <template>
   <div id="app">
     <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <ShapeGenerator :selected="getSelection()"/>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import ShapeGenerator from './components/ShapeGenerator.vue'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    ShapeGenerator
+  },
+  methods: {
+    getSelection(){
+      return {
+			StrokeThickness: 0.3,
+			Points:          4,
+			Fill:{
+				Hex:     "#ccccccc",
+				Opacity: 1.0,
+			},
+			Stroke:{
+				Hex:     "#772233",
+				Opacity: 0.7,
+			},
+			Path:   "ARKED",
+			MinRad: 1.0,
+			SizeCon:{
+				Width:      4.0,
+				Height:     4.0,
+				PixelScale: 100,
+			},
+      }
+    }
   }
 }
 </script>
