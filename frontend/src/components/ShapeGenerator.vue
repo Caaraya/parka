@@ -3,7 +3,6 @@
     <h2>Let's Create a Color Picker</h2>
     <button class="collapsible">inputs</button>
     <div class="container content">
-      <canvas id="color-picker"></canvas>
       <select id="select-color" name="select-color">
         <option id="Fill">Fill</option>
         <option id="Stroke">Stroke</option>
@@ -20,6 +19,7 @@
         </span>
         <label for="select-stroke">Stroke:</label>
         <span id="select-stroke">
+          <ColorPicker />
           <span id="select-stroke-color" class="select-stroke-color" v-bind:style="{'background-color': selected.Stroke.Hex}"></span>
           <input type="number" id="select-stroke-opacity" :value="selected.Stroke.Opacity"/>
         </span>
@@ -58,8 +58,12 @@
 </template>
 
 <script>
+import ColorPicker from './ColorPicker.vue'
 export default {
   name: 'ShapeGenerator',
+  components: {
+    ColorPicker
+  },
   props: {
     selected: Object
   }
