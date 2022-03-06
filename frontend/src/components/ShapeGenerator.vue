@@ -66,6 +66,19 @@ export default {
   },
   props: {
     selected: Object
+  },
+  computed: {
+    Stroke: function () {
+
+    },
+    Fill: function () {
+
+    }
+  },
+  methods : {
+    hextorgb(hex) {
+      
+    }
   }
 }
 </script>

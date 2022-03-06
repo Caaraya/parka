@@ -4,18 +4,22 @@
     <div class="color-picker__overlay" v-if="isVisible" v-on:click="hide"></div>
     <transition name="pop">
       <div class="color-picker__flyout" v-if="isVisible">
-    <div class="color-chip" v-bind:style="{'background': rgb}"/>
+    <div class="color-chip" v-bind:style="{'background' : rgb}"/>
     <div class="color-picker__inner">
       <div class="control" v-bind:style="gradientR">
-        <input type="range" min="0" max="250" v-model="r" />
+        <label class=slider-label>R</label>
+        <input type="range" min="0" max="255" v-model="r" />
       </div>
       <div class="control" v-bind:style="gradientG">
-        <input type="range" min="0" max="250" v-model="g" />
+        <label class=slider-label>G</label>
+        <input type="range" min="0" max="255" v-model="g" />
       </div>
       <div class="control" v-bind:style="gradientB">
-        <input type="range" min="0" max="250" v-model="b" />
+        <label class=slider-label>B</label>
+        <input type="range" min="0" max="255" v-model="b" />
       </div>
       <div class="control" v-bind:style="gradientA">
+        <label class=slider-label>A</label>
         <input type="range" min="0" max="100" v-model="a" />
       </div>
     </div>
@@ -28,7 +32,7 @@
 <script>
 export default {
   name: 'ColorPicker',
-  props:["change", "initial"],
+  props:["change", color],
   data: function() {
     return {
       isVisible: true,
@@ -40,8 +44,8 @@ export default {
   },
   computed: {
     rgb: function() {
-      var c = parseInt(this.r) + ", " + parseInt(this.g) + ", " + parseInt(this.b) + ", " +  parseFloat(this.a/100);
-      var s = "rgba(" + c + ")";
+      var c = parseInt(this.r) + ", " + parseInt(this.g) + ", " + parseInt(this.b);
+      var s = "rgb(" + c + ")"; 
       return s;
     },
     gradientR: function() {
@@ -109,10 +113,6 @@ export default {
       this.isVisible = !this.isVisible;
     }
   },
-  
-  mounted: function () {
-    this.h = parseInt(Math.random() * 360)
-  }
 }
 </script>
 
@@ -176,6 +176,12 @@ body {
 
 .control + .control {
   margin-top: 1rem;
+}
+
+.slider-label {
+  text-align: right;
+  font-family: 'Courier New', Courier, monospace;
+  font-style: oblique;
 }
 
 .control input {
